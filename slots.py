@@ -1,4 +1,21 @@
 import random
+with open("accounts.txt", "a") as file:
+    user_input=input('Login or Create Account? (login/create): ')
+    if user_input == 'create':
+        create_account=input('type in a usernme and password you would like. (username_password): ')
+        with open("account.txt", "a") as f:
+            f.write(create_account)
+    elif user_input == 'login':
+        account_login= input('enter username:password: ')
+        with open('account.txt', 'r') as f:
+            content = f.read()
+            if account_login in content:
+                print("Welcome back to Lucky Loop",account_login)
+            else:
+                print("Account not found. Try again")
+
+accounts = {}
+
 
 symbols = ["🍒", "🍋", "🍊", "🍇", "🔔", "💎"]
 coins = 50
