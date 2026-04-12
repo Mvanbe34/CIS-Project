@@ -1,4 +1,66 @@
 import random
+
+symbols = ["🍒", "🍋", "🍊", "🍇", "🔔", "💎"]
+coins = 50
+
+print(f"{coins} 🪙")
+print("Welcome to 🍀 Lucky Loop 🍀")
+
+while True:
+    spinning = input("Spin for 5 🪙 ? yes/cash out: ").strip().lower()
+
+    if not ((spinning == "yes" or spinning == "") and coins > 4):
+        print(f"You left with {coins} 🪙")
+        break
+
+    coins -= 5
+    print("🍀Lucky Loop🍀")
+
+    board = [random.choice(symbols) for _ in range(9)]
+
+    for i in range(0, 9, 3):
+        print(board[i], board[i + 1], board[i + 2], sep="  ")
+
+    if board[0] == board[1] == board[2]:
+        coins += 15
+        print("Top Row +15 🪙")
+
+    if board[3] == board[4] == board[5]:
+        if board[3] == "💎":
+            coins += 500
+            print("MEGA JACKPOT!!!!!!!!! +500 🪙")
+        else:
+            coins += 50
+            print("Middle Row +50 🪙")
+
+    if board[6] == board[7] == board[8]:
+        coins += 15
+        print("Bottom Row +15 🪙")
+
+    if board[0] == board[3] == board[6]:
+        coins += 10
+        print("First Column +10 🪙")
+
+    if board[1] == board[4] == board[7]:
+        coins += 10
+        print("Second Column +10 🪙")
+
+    if board[2] == board[5] == board[8]:
+        coins += 10
+        print("Third Column +10 🪙")
+
+    if board[0] == board[4] == board[8]:
+        coins += 20
+        print("Main Diagonal +20 🪙")
+
+    if board[2] == board[4] == board[6]:
+        coins += 20
+        print("Anti Diagonal +20 🪙")
+
+    print(f"{coins} 🪙")
+
+'''
+import random
 symbols = ["🍒", "🍋", "🍊", "🍇", "🔔", "💎"]
 count = 0
 counts = 0
@@ -56,3 +118,4 @@ while flag == True:
     else:
         print(f"You left with {coins} 🪙")
         flag = False
+'''
