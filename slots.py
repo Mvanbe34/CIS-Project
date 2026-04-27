@@ -1,33 +1,81 @@
 import random
-with open("accounts.txt", "a") as file:
-    user_input=input('Login or Create Account? (login/create): ')
-    if user_input == 'create':
-        create_account=input('type in a usernme and password you would like. (username_password): ')
-        with open("account.txt", "a") as f:
-            f.write(create_account)
-    elif user_input == 'login':
-        account_login= input('enter username:password: ')
-        with open('account.txt', 'r') as f:
-            content = f.read()
-            if account_login in content:
-                print("Welcome back to Lucky Loop",account_login)
+
+ACCOUNTS_FILE = "accounts.txt"
+
+def load_accounts():
+    accounts = {}
+    try:
+        f = open(ACCOUNTS_FILE, "r")
+        for line in f:
+            parts = line.strip().split(" ")
+            if len(parts) >= 2:
+                username = parts[0]
+                password = parts[1]
+                coins = int(parts[2]) if len(parts) >= 3 else 50
+                accounts[username] = {"password": password, "coins": coins}
+        f.close()
+    except FileNotFoundError:
+        pass
+    return accounts
+
+def save_accounts(accounts):
+    f = open(ACCOUNTS_FILE, "w")
+    for username, data in accounts.items():
+        f.write(f"{username} {data['password']} {data['coins']}\n")
+    f.close()
+
+def login():
+    while True:
+        choice = input("Login or Create Account? (login/create): ").strip().lower()
+
+        if choice == "create":
+            accounts = load_accounts()
+            username = input("Choose a username: ").strip()
+            if " " in username:
+                print("Username cannot contain spaces.")
+                continue
+            if username in accounts:
+                print("Username already taken. Try a different one.")
+                continue
+            password = input("Choose a password: ").strip()
+            if " " in password:
+                print("Password cannot contain spaces.")
+                continue
+            accounts[username] = {"password": password, "coins": 50}
+            save_accounts(accounts)
+            print(f"Account created! Welcome, {username}!")
+            return username, 50
+
+        elif choice == "login":
+            accounts = load_accounts()
+            username = input("Username: ").strip()
+            password = input("Password: ").strip()
+            if username in accounts and accounts[username]["password"] == password:
+                saved_coins = accounts[username]["coins"]
+                print(f"Welcome back to Lucky Loop, {username}!")
+                return username, saved_coins
             else:
-                print("Account not found. Try again")
+                print("Invalid username or password. Try again.")
 
-accounts = {}
+        else:
+            print("Please type 'login' or 'create'.")
 
+username, coins = login()
 
 symbols = ["🍒", "🍋", "🍊", "🍇", "🔔", "💎"]
-coins = 50
 
 print(f"{coins} 🪙")
-print("Welcome to 🍀 Lucky Loop 🍀")
+print(f"Welcome to 🍀 Lucky Loop 🍀, {username}!")
 
 while True:
     spinning = input("Spin for 5 🪙 ? yes/cash out: ").strip().lower()
 
     if not ((spinning == "yes" or spinning == "") and coins > 4):
         print(f"You left with {coins} 🪙")
+        accounts = load_accounts()
+        accounts[username]["coins"] = coins
+        save_accounts(accounts)
+        print("Coins saved to your account!")
         break
 
     coins -= 5
@@ -75,64 +123,3 @@ while True:
         print("Anti Diagonal +20 🪙")
 
     print(f"{coins} 🪙")
-
-'''
-import random
-symbols = ["🍒", "🍋", "🍊", "🍇", "🔔", "💎"]
-count = 0
-counts = 0
-points_checker = []
-coins = 50
-print(f"{coins} 🪙")
-flag = True
-print("Welcome to 🍀 Lucky Loop 🍀")
-while flag == True:
-    spinning = input("Spin for 5 🪙 ? yes/cash out: ")
-    if (spinning == "yes" or spinning == "") and coins > 4:
-        coins -= 5
-        print("🍀Lucky Loop🍀")
-        while counts != 3:
-            while count != 3:
-                winner_emoji = random.choice(symbols)
-                print(winner_emoji, end='  ')
-                points_checker.append(winner_emoji)
-                count += 1
-            count = 0
-            print()
-            counts += 1
-        if points_checker[0] == points_checker[1] == points_checker[2]:
-            coins += 15
-            print("Top Row +15 🪙")
-        if points_checker[3] == points_checker[4] == points_checker[5]:
-            if points_checker[3] == "💎":
-                coins += 500
-                print("MEGA JACKPOT!!!!!!!!! +500 🪙")
-            else:
-                coins += 50
-                print("Middle Row +50 🪙")
-        if points_checker[6] == points_checker[7] == points_checker[8]:
-            coins += 15
-            print("Bottom Row +15 🪙")
-        if points_checker[0] == points_checker[3] == points_checker[6]:
-            coins += 10
-            print("First Column +10 🪙")
-        if points_checker[1] == points_checker[4] == points_checker[7]:
-            coins += 10
-            print("Second Column +10 🪙")
-        if points_checker[2] == points_checker[5] == points_checker[8]:
-            coins += 10
-            print("Third Column +10 🪙")
-        if points_checker[0] == points_checker[4] == points_checker[8]:
-            coins += 20
-            print("Main Diagonal +20 🪙")
-        if points_checker[2] == points_checker[4] == points_checker[6]:
-            coins += 10
-            print("Anti Diagonal +20 🪙")
-        print(f"{coins} 🪙")
-        points_checker = []
-        count = 0
-        counts = 0
-    else:
-        print(f"You left with {coins} 🪙")
-        flag = False
-'''
