@@ -15,7 +15,10 @@ def load_accounts():
                 username = parts[0]
                 password = parts[1]
                 # default to 50 coins if the coins field is missing
-                coins = int(parts[2]) if len(parts) >= 3 else 50
+                try:
+                    coins = int(parts[2]) if len(parts) >= 3 else 50
+                except ValueError:
+                    coins = 50
                 accounts[username] = {"password": password, "coins": coins}
         f.close()
     except FileNotFoundError:
@@ -87,6 +90,13 @@ class Slot_Machine:
             print("You can afford to spin!")
         else:
             print("You can not afford to spin.")
+    def check_win(self, first, second, third, payout, label):
+        # returns winnings if the three board positions all match, else 0
+        if board[first] == board[second] == board[third]:
+            won = payout * m
+            print(f"{label} +{won} 🪙")
+            return won
+        return 0
 
 machine1 = Slot_Machine("Lucky Loop 🍀", 5, ["🍒", "🍋", "🍊", "🍇", "🔔", "💎"])
 machine2 = Slot_Machine("High Roller 👑", 15, ["🦁", "👑", "💰", "🎰", "🌟", "🔥"])
@@ -140,10 +150,7 @@ while True:
     # scale all payouts proportionally to the spin cost (base cost is 5)
     m = machine.spin_cost // 5
 
-    # top row win
-    if board[0] == board[1] == board[2]:
-        coins += 15 * m
-        print(f"Top Row +{15 * m} 🪙")
+    coins += machine.check_win(0, 1, 2, 15, "Top Row")
 
     # middle row win — jackpot symbol triggers the mega jackpot
     if board[3] == board[4] == board[5]:
@@ -151,34 +158,13 @@ while True:
             coins += 500 * m
             print(f"MEGA JACKPOT!!!!!!!!! +{500 * m} 🪙")
         else:
-            coins += 50 * m
-            print(f"Middle Row +{50 * m} 🪙")
+            coins += machine.check_win(3, 4, 5, 50, "Middle Row")
 
-    # bottom row win
-    if board[6] == board[7] == board[8]:
-        coins += 15 * m
-        print(f"Bottom Row +{15 * m} 🪙")
-
-    # column wins (smaller payout than rows)
-    if board[0] == board[3] == board[6]:
-        coins += 10 * m
-        print(f"First Column +{10 * m} 🪙")
-
-    if board[1] == board[4] == board[7]:
-        coins += 10 * m
-        print(f"Second Column +{10 * m} 🪙")
-
-    if board[2] == board[5] == board[8]:
-        coins += 10 * m
-        print(f"Third Column +{10 * m} 🪙")
-
-    # diagonal wins
-    if board[0] == board[4] == board[8]:
-        coins += 20 * m
-        print(f"Main Diagonal +{20 * m} 🪙")
-
-    if board[2] == board[4] == board[6]:
-        coins += 20 * m
-        print(f"Anti Diagonal +{20 * m} 🪙")
+    coins += machine.check_win(6, 7, 8, 15, "Bottom Row")
+    coins += machine.check_win(0, 3, 6, 10, "First Column")
+    coins += machine.check_win(1, 4, 7, 10, "Second Column")
+    coins += machine.check_win(2, 5, 8, 10, "Third Column")
+    coins += machine.check_win(0, 4, 8, 20, "Main Diagonal")
+    coins += machine.check_win(2, 4, 6, 20, "Anti Diagonal")
 
     print(f"{coins} 🪙")
